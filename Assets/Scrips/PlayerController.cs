@@ -4,40 +4,39 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public Camera mainCamera;
+    public Camera playerCamera;
 
     public float speed;
 
-    public Rigidbody playerRb;
+    public float rotationSpeed = 10;
+    private float m_CameraVerticalAngle;
 
-    private float horizontalMovement;
-    private float frontMovement;
+    private Vector3 m_Movement = Vector3.zero;
+    private Vector3 m_RotationInput = Vector3.zero;
 
-    Vector3 offset = new Vector3(0, 2, 0);
-
-    private void Start()
-    {
-        playerRb = playerRb.GetComponent<Rigidbody>();
-
-    }
 
     private void Update()
     {
         _Movement();
-        mainCamera.transform.position = transform.position + offset;
+        _LookAt();
     }
 
     private void _Movement()
     {
-        
-        horizontalMovement = Input.GetAxis("Horizontal");
-        transform.Translate(Vector3.right * horizontalMovement * speed * Time.deltaTime);
-        //playerRb.AddForce(Vector3.right * horizontalMovement * speed * Time.deltaTime); //with rB
+        m_Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        transform.Translate(m_Movement * speed * Time.deltaTime);
+    }
 
+    private void _LookAt()
+    {
+        m_RotationInput.x = Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
+        m_RotationInput.y = Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime;
 
-        frontMovement = Input.GetAxis("Vertical");
-        transform.Translate(Vector3.forward * frontMovement * speed * Time.deltaTime);
-        //playerRb.AddForce(Vector3.forward * frontMovement * speed * Time.deltaTime); //with rB
+        m_CameraVerticalAngle += m_RotationInput.y;
+        m_CameraVerticalAngle = Mathf.Clamp(m_CameraVerticalAngle, -70, 70);
+
+        transform.Rotate(Vector3.up * m_RotationInput.x);
+        playerCamera.transform.localRotation = Quaternion.Euler(-m_CameraVerticalAngle, 0, 0);
     }
 
 }
