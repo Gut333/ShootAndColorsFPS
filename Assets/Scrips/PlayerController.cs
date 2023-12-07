@@ -2,18 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+[RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
+    
+
     public Camera playerCamera;
 
-    public float speed;
+    public float walkSpeed;
+    public float runSpeed;
+    public float jumpHeight = 2.0f;
+    public float gravityScale = -20f;
 
-    public float rotationSpeed = 10;
+    public float rotationSpeed = 10f;
     private float m_CameraVerticalAngle;
 
-    private Vector3 m_Movement = Vector3.zero;
+    private Vector3 m_MovementInput = Vector3.zero;
     private Vector3 m_RotationInput = Vector3.zero;
-
+    private CharacterController characterController;
+    private void Awake()
+    {
+        characterController = GetComponent<CharacterController>();
+    }
 
     private void Update()
     {
@@ -23,8 +34,35 @@ public class PlayerController : MonoBehaviour
 
     private void _Movement()
     {
-        m_Movement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        transform.Translate(m_Movement * speed * Time.deltaTime);
+        if (characterController.isGrounded)
+        {
+            m_MovementInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            _Sprint();
+            _Jump();
+        }
+
+        m_MovementInput.y += gravityScale * Time.deltaTime;
+        characterController.Move(m_MovementInput * Time.deltaTime);
+    }
+
+    private void _Sprint()
+    {
+        if (Input.GetButton("Sprint"))
+        {
+            m_MovementInput = transform.TransformDirection(m_MovementInput) * runSpeed;
+        }
+        else
+        {
+            m_MovementInput = transform.TransformDirection(m_MovementInput) * walkSpeed;
+        }
+    }
+
+    private void _Jump()
+    {
+        if (Input.GetButton("Jump"))
+        {
+            m_MovementInput.y = Mathf.Sqrt(jumpHeight * -2f * gravityScale);
+        }
     }
 
     private void _LookAt()
