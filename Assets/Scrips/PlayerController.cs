@@ -6,8 +6,6 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
-    
-
     public Camera playerCamera;
 
     public float walkSpeed;
@@ -16,8 +14,9 @@ public class PlayerController : MonoBehaviour
     public float gravityScale = -20f;
 
     public float rotationSpeed = 10f;
-    private float m_CameraVerticalAngle;
 
+    
+    private float m_CameraVerticalAngle;
     private Vector3 m_MovementInput = Vector3.zero;
     private Vector3 m_RotationInput = Vector3.zero;
     private CharacterController characterController;
